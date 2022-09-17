@@ -1,26 +1,59 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCiudadDto } from './dto/create-ciudad.dto';
 import { UpdateCiudadDto } from './dto/update-ciudad.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Ciudad } from './entities/ciudad.entity';
+import { BusinessError, BusinessLogicException } from '../shared/errors/business-errors';
 
 @Injectable()
 export class CiudadService {
-  create(createCiudadDto: CreateCiudadDto) {
-    return 'This action adds a new ciudad';
+
+  constructor(
+    @InjectRepository(Ciudad)
+    private readonly ciudadRepository: Repository<Ciudad>
+  ){}
+  
+  validatPais(pais:string):boolean{
+    const paises = [
+      "Argentina", 
+      "Ecuador", 
+      "Paraguay"
+    ]
+    return paises.includes(pais);
   }
 
-  findAll() {
-    return `This action returns all ciudad`;
+  async create(ciudad: Ciudad): Promise<Ciudad>  {
+    
+    if (!this.validatPais(ciudad.pais))
+      throw new BusinessLogicException("Valor de pais invalido", BusinessError.PRECONDITION_FAILED);
+    return await this.ciudadRepository.save(ciudad);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} ciudad`;
+  async findAll(): Promise<Ciudad[]> {
+    return await this.ciudadRepository.find({ relations: ["supermercados"] });
   }
 
-  update(id: number, updateCiudadDto: UpdateCiudadDto) {
-    return `This action updates a #${id} ciudad`;
+  async findOne(id: string) {
+    const ciudad: Ciudad = await this.ciudadRepository.findOne({where: {id}, relations: ["supermercados"] } );
+    if (!ciudad)
+      throw new BusinessLogicException("Ciudad no encontrada", BusinessError.NOT_FOUND);
+    return ciudad;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} ciudad`;
+  async update(id: string, ciudad: Ciudad) {
+    if (this.validatPais(ciudad.pais))
+      throw new BusinessLogicException("Valor de pais invalido", BusinessError.PRECONDITION_FAILED);
+    const ciudadUpdate: Ciudad = await this.ciudadRepository.findOne({where: {id} } );
+    if (!ciudadUpdate)
+      throw new BusinessLogicException("Ciudad no encontrada", BusinessError.NOT_FOUND);
+      return await this.ciudadRepository.save({...ciudadUpdate, ...ciudad});
+  }
+
+  async remove(id: string) {
+    const ciudad: Ciudad = await this.ciudadRepository.findOne({where: {id}, relations: ["supermercados"] } );
+    if (!ciudad)
+      throw new BusinessLogicException("Ciudad no encontrada", BusinessError.NOT_FOUND);
+    await this.ciudadRepository.remove(ciudad);
   }
 }

@@ -11,6 +11,9 @@ export class Ciudad {
   nombre: string;
 
   @Column()
+  pais: string;
+
+  @Column()
   num_habitantes: number;
 
   @ManyToMany(() => Supermercado, supermecado => supermecado.ciudades)
