@@ -10,12 +10,12 @@ describe('CiudadService', () => {
   let service: CiudadService;
   let repository: Repository<Ciudad>;
   let ciudadesList: Ciudad[];
-  const paises = [
+  let paises = [
     "Argentina", 
     "Ecuador", 
     "Paraguay"
   ]
-
+  let pos_pais = Math.floor(Math.random() * 4);
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [...TypeOrmTestingConfig()],
@@ -33,7 +33,7 @@ describe('CiudadService', () => {
     for(let i = 0; i < 5; i++){
         const ciudad: Ciudad = await repository.save({
         nombre: faker.address.city(),
-        pais: faker.lorem.sentence(),
+        pais: paises[0],
         num_habitantes: parseInt(faker.random.numeric(6))})
         ciudadesList.push(ciudad);
     }
@@ -44,8 +44,29 @@ describe('CiudadService', () => {
     expect(service).toBeDefined();
   });
 
-  it('CREATE --- debe retornar una nueva ciudad', async () => {
-    let pos_pais = Math.floor(Math.random() * 4);
+  it('findAll --- Debe retornar todas las ciudades', async () => {
+    const ciudades: Ciudad[] = await service.findAll();
+    expect(ciudades).not.toBeNull();
+    expect(ciudades).toHaveLength(ciudadesList.length);
+  });
+
+  it('findOne --- Debe retornar una ciudad', async () => {
+    const storedCiudad: Ciudad = ciudadesList[0];
+    const ciudad: Ciudad = await service.findOne(storedCiudad.id);
+    expect(ciudad).not.toBeNull();
+    expect(ciudad.nombre).toEqual(storedCiudad.nombre)
+    expect(ciudad.pais).toEqual(storedCiudad.pais)
+    expect(ciudad.num_habitantes).toEqual(storedCiudad.num_habitantes)
+    
+  });
+
+  it('findOne --- Debe retornar un error por ciudad invalida', async () => {
+    await expect(() => service.findOne("0")).rejects.toHaveProperty("message", "Ciudad no encontrada")
+  });
+
+
+  it('CREATE --- Debe retornar una nueva ciudad', async () => {
+    
     const ciudad: Ciudad = {
       id: "",
       nombre: faker.address.city(),
@@ -65,7 +86,7 @@ describe('CiudadService', () => {
   });
 
   it('CREATE --- debe retornar un error por un pais no valido', async () => {
-    let pos_pais = Math.floor(Math.random() * 4);
+    
     const ciudad: Ciudad = {
       id: "",
       nombre: faker.address.city(),
@@ -74,5 +95,50 @@ describe('CiudadService', () => {
       supermercados: []
     }
     await expect(() => service.create(ciudad)).rejects.toHaveProperty("message", "Valor de pais invalido")
+  });
+
+  it('UPDATE --- Debe modificar una ciudad', async () => {
+    const ciudad: Ciudad = ciudadesList[0];
+    ciudad.nombre = "Chiquinquira";
+    ciudad.pais = paises[1];
+  
+    const updatedciudad: Ciudad = await service.update(ciudad.id, ciudad);
+    expect(updatedciudad).not.toBeNull();
+  
+    const storedciudad: Ciudad = await repository.findOne({ where: { id: ciudad.id } })
+    expect(storedciudad).not.toBeNull();
+    expect(storedciudad.nombre).toEqual(ciudad.nombre)
+  });
+
+  it('UPDATE --- Debe retornar un error por pais no valido', async () => {
+    const ciudad: Ciudad = ciudadesList[0];
+    ciudad.nombre = "Chiquinquira";
+    ciudad.pais = faker.address.city();
+  
+    await expect(() => service.update(ciudad.id, ciudad)).rejects.toHaveProperty("message", "Valor de pais invalido")
+   
+  });
+
+
+  it('UPDATE ---  Debe retornar un error por ciudad no encontrada', async () => {
+    let ciudad: Ciudad = ciudadesList[0];
+    ciudad = {
+      ...ciudad, nombre: "Barranquilla", pais: paises[1]
+    }
+    await expect(() => service.update("0", ciudad)).rejects.toHaveProperty("message", "Ciudad no encontrada")
+  });
+
+  it('delete Debe eliminar una ciduad', async () => {
+    const ciudad: Ciudad = ciudadesList[0];
+    await service.delete(ciudad.id);
+  
+    const deletedciudad: Ciudad = await repository.findOne({ where: { id: ciudad.id } })
+    expect(deletedciudad).toBeNull();
+  });
+
+  it('delete Debe retornar un error por ciudad no encontrada', async () => {
+    const ciudad: Ciudad = ciudadesList[0];
+    await service.delete(ciudad.id);
+    await expect(() => service.delete("0")).rejects.toHaveProperty("message", "Ciudad no encontrada")
   });
 });

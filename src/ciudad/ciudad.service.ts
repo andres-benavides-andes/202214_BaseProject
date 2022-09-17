@@ -42,15 +42,16 @@ export class CiudadService {
   }
 
   async update(id: string, ciudad: Ciudad) {
-    if (this.validatPais(ciudad.pais))
-      throw new BusinessLogicException("Valor de pais invalido", BusinessError.PRECONDITION_FAILED);
+    
     const ciudadUpdate: Ciudad = await this.ciudadRepository.findOne({where: {id} } );
     if (!ciudadUpdate)
       throw new BusinessLogicException("Ciudad no encontrada", BusinessError.NOT_FOUND);
+    if (!this.validatPais(ciudad.pais))
+      throw new BusinessLogicException("Valor de pais invalido", BusinessError.PRECONDITION_FAILED);
       return await this.ciudadRepository.save({...ciudadUpdate, ...ciudad});
   }
 
-  async remove(id: string) {
+  async delete(id: string) {
     const ciudad: Ciudad = await this.ciudadRepository.findOne({where: {id}, relations: ["supermercados"] } );
     if (!ciudad)
       throw new BusinessLogicException("Ciudad no encontrada", BusinessError.NOT_FOUND);

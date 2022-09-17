@@ -29,6 +29,6 @@ export class CiudadController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.ciudadService.remove(id);
+    return this.ciudadService.delete(id);
   }
 }
