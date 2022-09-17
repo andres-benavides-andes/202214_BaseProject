@@ -70,7 +70,7 @@ describe('CiudadService', () => {
     const ciudad: Ciudad = {
       id: "",
       nombre: faker.address.city(),
-      pais: paises[pos_pais],
+      pais: paises[2],
       num_habitantes: parseInt(faker.random.numeric(6)),
       supermercados: []
     }
