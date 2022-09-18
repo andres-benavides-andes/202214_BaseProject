@@ -41,7 +41,8 @@ export class SupermercadoService {
     const supermercadoUpdate: Supermercado = await this.supermercadoRepository.findOne({where: {id} } );
     if (!supermercadoUpdate)
       throw new BusinessLogicException("Supermercado no encontrado", BusinessError.NOT_FOUND);
-    //this.validarLongitudNombre(supermercadoUpdate.nombre)
+    let nombreSupermercado = (supermercado.nombre == null) ? supermercadoUpdate.nombre : supermercado.nombre
+    this.validarLongitudNombre(nombreSupermercado)
     
     return await this.supermercadoRepository.save({...supermercadoUpdate, ...supermercado});
   }

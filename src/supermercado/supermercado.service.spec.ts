@@ -113,7 +113,7 @@ describe('SupermercadoService', () => {
   it('UPDATE --- Debe retornar un error por longitud de nombre no valido', async () => {
     const supermercado: Supermercado = supermercadoesList[0];
     supermercado.nombre = "D1";
-    supermercado.longitud = faker.address.city();
+    supermercado.longitud = faker.address.longitude();
   
     await expect(() => service.update(supermercado.id, supermercado)).rejects.toHaveProperty("message", errorValidacion)
    

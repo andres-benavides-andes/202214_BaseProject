@@ -44,7 +44,9 @@ export class CiudadService {
     const ciudadUpdate: Ciudad = await this.ciudadRepository.findOne({where: {id} } );
     if (!ciudadUpdate)
       throw new BusinessLogicException("Ciudad no encontrada", BusinessError.NOT_FOUND);
-    if (!this.validatPais(ciudadUpdate.pais))
+    
+    let nombrePais = (ciudad.pais == null) ? ciudadUpdate.pais : ciudad.pais
+    if (!this.validatPais(nombrePais))
       throw new BusinessLogicException("Valor de pais invalido", BusinessError.PRECONDITION_FAILED);
       return await this.ciudadRepository.save({...ciudadUpdate, ...ciudad});
   }
