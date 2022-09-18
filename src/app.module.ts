@@ -6,6 +6,7 @@ import { SupermercadoModule } from './supermercado/supermercado.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Supermercado } from './supermercado/entities/supermercado.entity';
 import { Ciudad } from './ciudad/entities/ciudad.entity';
+import { CiudadSupermercadoModule } from './ciudad-supermercado/ciudad-supermercado.module';
 
 @Module({
   imports: [CiudadModule, SupermercadoModule,
@@ -20,7 +21,8 @@ import { Ciudad } from './ciudad/entities/ciudad.entity';
       dropSchema: true,
       synchronize: true,
       keepConnectionAlive: true
-    })],
+    }),
+    CiudadSupermercadoModule],
   controllers: [AppController],
   providers: [AppService],
 })

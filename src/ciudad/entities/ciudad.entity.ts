@@ -18,7 +18,7 @@ export class Ciudad {
 
   @ManyToMany(() => Supermercado, supermecado => supermecado.ciudades)
   @JoinTable()
-  supermercados: Ciudad[];
+  supermercados: Supermercado[];
 
 
 }

@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateCiudadDto } from './dto/create-ciudad.dto';
-import { UpdateCiudadDto } from './dto/update-ciudad.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Ciudad } from './entities/ciudad.entity';
