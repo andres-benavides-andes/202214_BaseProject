@@ -1,15 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete,UseInterceptors,HttpCode } from '@nestjs/common';
 import { CiudadService } from './ciudad.service';
 import { CreateCiudadDto } from './dto/create-ciudad.dto';
 import { UpdateCiudadDto } from './dto/update-ciudad.dto';
 import { Ciudad } from './entities/ciudad.entity';
-@Controller('ciudad')
+import { plainToInstance } from 'class-transformer';
+import { BusinessErrorsInterceptor } from '../shared/interceptors/business-errors.interceptor'
+
+@UseInterceptors(BusinessErrorsInterceptor)
+@Controller('ciudades')
 export class CiudadController {
   constructor(private readonly ciudadService: CiudadService) {}
 
   @Post()
-  create(@Body() createCiudadDto: Ciudad) {
-    return this.ciudadService.create(createCiudadDto);
+  create(@Body() createCiudadDto: CreateCiudadDto) {
+    const ciudad: Ciudad = plainToInstance(Ciudad, createCiudadDto);
+    return this.ciudadService.create(ciudad);
   }
 
   @Get()
@@ -22,12 +27,14 @@ export class CiudadController {
     return this.ciudadService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCiudadDto: Ciudad) {
-    return this.ciudadService.update(id, updateCiudadDto);
+  @Put(':id')
+  update(@Param('id') id: string, @Body() updateCiudadDto: UpdateCiudadDto) {
+    const ciudad: Ciudad = plainToInstance(Ciudad, updateCiudadDto);
+    return this.ciudadService.update(id, ciudad);
   }
 
   @Delete(':id')
+  @HttpCode(204)
   remove(@Param('id') id: string) {
     return this.ciudadService.delete(id);
   }

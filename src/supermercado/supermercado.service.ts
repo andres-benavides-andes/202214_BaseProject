@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateSupermercadoDto } from './dto/create-supermercado.dto';
-import { UpdateSupermercadoDto } from './dto/update-supermercado.dto';
 import { Supermercado } from './entities/supermercado.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -43,7 +41,8 @@ export class SupermercadoService {
     const supermercadoUpdate: Supermercado = await this.supermercadoRepository.findOne({where: {id} } );
     if (!supermercadoUpdate)
       throw new BusinessLogicException("Supermercado no encontrado", BusinessError.NOT_FOUND);
-    this.validarLongitudNombre(supermercado.nombre)
+    //this.validarLongitudNombre(supermercadoUpdate.nombre)
+    
     return await this.supermercadoRepository.save({...supermercadoUpdate, ...supermercado});
   }
 
